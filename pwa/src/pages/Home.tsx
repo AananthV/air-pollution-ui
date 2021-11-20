@@ -2,18 +2,25 @@ import React from 'react';
 import Graph from '../components/Graph';
 import Sensor from '../components/Sensor';
 import { getAQIColor, getAQIDescriptor } from '../utils/aqi';
+import useSensors from '../hooks/useSensors';
 
 function Home() {
-    const aqi = 126;
+    const sensorDataWithAQIList = useSensors();
+
+    console.log(sensorDataWithAQIList);
+
+    const n = sensorDataWithAQIList.AQI.length;
+
+    const aqi = sensorDataWithAQIList.AQI[n - 1];
+
+    console.log(n, aqi);
 
     return (
         <div>
             <div className="my-8 px-2 py-4 flex flex-col items-center">
-                <div className="flex flex-row items-center">
-                    <div className="flex flex-row justify-end items-start w-6/12">
-                        <div className="text-8xl" style={{color: getAQIColor(aqi)}}>{aqi}</div>
-                    </div>
-                    <div className="w-6/12 pl-2 pr-14">
+                <div className="flex flex-row items-center justify-center">
+                    <div className="text-8xl" style={{color: getAQIColor(aqi)}}>{aqi}</div>
+                    <div className="pl-2">
                         <div>Air Quality Index</div>
                         <strong>{getAQIDescriptor(aqi)}</strong>
                     </div>
@@ -23,8 +30,9 @@ function Home() {
                 </div>
             </div>
             <div className="divide-y divide-black">
-                {[1, 2, 3, 4, 5, 6].map(x => (
-                    <Sensor name="Abcd" value={15} unit="ppm" aqi={x * 50} />
+                {["O3", "PM10", "PM25", "NO2", "SO2", "CO"].map(x => (
+                    // @ts-ignore
+                    <Sensor name={x} value={15} unit="ppm" aqi={sensorDataWithAQIList[x][n - 1]} />
                 ))}
             </div>
         </div>
