@@ -5,15 +5,13 @@ import { getAQIColor, getAQIDescriptor } from '../utils/aqi';
 import useSensors from '../hooks/useSensors';
 
 function Home() {
-    const sensorDataWithAQIList = useSensors();
+    const [sensorData, sensorDataWithAQI] = useSensors();
 
-    console.log(sensorDataWithAQIList);
+    console.log(sensorDataWithAQI);
 
-    const n = sensorDataWithAQIList.AQI.length;
+    const aqi = sensorDataWithAQI.AQI;
 
-    const aqi = sensorDataWithAQIList.AQI[n - 1];
-
-    console.log(n, aqi);
+    console.log(aqi);
 
     return (
         <div>
@@ -32,11 +30,29 @@ function Home() {
             <div className="divide-y divide-black">
                 {["O3", "PM10", "PM25", "NO2", "SO2", "CO"].map(x => (
                     // @ts-ignore
-                    <Sensor name={x} value={15} unit="ppm" aqi={sensorDataWithAQIList[x][n - 1]} />
+                    <Sensor name={sensorName[x]} value={sensorData[x]} unit={sensorUnit[x]} aqi={sensorDataWithAQI[x]} />
                 ))}
             </div>
         </div>
     )
+}
+
+const sensorUnit = {
+    O3: "ppm",
+    PM10: "μg/m\xB3",
+    PM25: "μg/m\xB3",
+    NO2: "ppb",
+    SO2: "ppb",
+    CO: "ppm"
+}
+
+const sensorName = {
+    O3: "O₃",
+    PM10: "PM10",
+    PM25: "PM2.5",
+    NO2: "NO₂",
+    SO2: "SO₂",
+    CO: "CO"
 }
 
 export default Home;

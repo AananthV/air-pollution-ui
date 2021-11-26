@@ -39,6 +39,8 @@ export function processSensorData(sensorData: SensorData): SensorDataWithAQI {
         let i = 0;
         while (BREAKPOINTS[sensorName][i] < value) i++;
 
+        i--;
+
         sensorDataWithAQI[sensorName] = calculateAQI(
             value, 
             BREAKPOINTS[sensorName][i + 1],
@@ -55,7 +57,7 @@ export function processSensorData(sensorData: SensorData): SensorDataWithAQI {
 }
 
 function calculateAQI(c: number, bp_hi: number, bp_lo: number, i_hi: number, i_lo: number): number {
-    return i_lo + (i_hi - i_lo) * (c - bp_lo) / (bp_hi - bp_lo)
+    return Math.round(i_lo + (i_hi - i_lo) * (c - bp_lo) / (bp_hi - bp_lo));
 }
 
 const INDICES = [0, 50, 100, 150, 200, 300, 400, 500]

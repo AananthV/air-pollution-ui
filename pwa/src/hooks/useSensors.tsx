@@ -1,43 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { SOCKET_URL } from '../config';
-import SensorData, { SensorDataWithAQIList } from '../interfaces/SensorData';
+import SensorData, { SensorDataWithAQI } from '../interfaces/SensorData';
 import { processSensorData } from "../utils/aqi";
 
-function useSensors() {
-    const [sensorDataWithAQIList, setSensorDataWithAQIList] = useState<SensorDataWithAQIList>(() => ({
-        O3: [1, 2, 3, 4, 5].map(x => 25),
-        PM10: [1, 2, 3, 4, 5].map(x => 75),
-        PM25: [1, 2, 3, 4, 5].map(x => 125),
-        NO2: [1, 2, 3, 4, 5].map(x => 175),
-        SO2: [1, 2, 3, 4, 5].map(x => 225),
-        CO: [1, 2, 3, 4, 5].map(x => 275),
-        AQI: [1, 2, 3, 4, 5].map(x => 325)
+function useSensors() : [SensorData, SensorDataWithAQI] {
+    const [sensorDataWithAQI, setSensorDataWithAQI] = useState<SensorDataWithAQI>(() => ({
+        O3: 0,
+        PM10: 0,
+        PM25: 0,
+        NO2: 0,
+        SO2: 0,
+        CO: 0,
+        AQI: 0,
+    }));
+
+    const [sensorData, setSensorData] = useState<SensorData>(() => ({
+        O3: 0,
+        PM10: 0,
+        PM25: 0,
+        NO2: 0,
+        SO2: 0,
+        CO: 0
     }));
 
     useEffect(() => {
+
         const socket = io(SOCKET_URL);
 
         socket.on("sensorUpdate", (sensorData: SensorData) => {
             const sensorDataWithAQI = processSensorData(sensorData);
-
-            Object.keys(sensorDataWithAQIList).forEach(key => {
-                // @ts-ignore
-                sensorDataWithAQIList[key].pop();
-
-                // @ts-ignore
-                sensorDataWithAQIList[key].push(sensorDataWithAQI[key]);
-            });
-
-            setSensorDataWithAQIList(sensorDataWithAQIList);
+            setSensorData(sensorData);
+            setSensorDataWithAQI(sensorDataWithAQI);
         });
 
         return () => {
             socket.close();
         }
-    })
+    }, [])
 
-    return sensorDataWithAQIList
+    return [sensorData, sensorDataWithAQI]
 }
 
 export default useSensors;
