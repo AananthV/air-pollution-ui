@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Graph from '../components/Graph';
 import Sensor from '../components/Sensor';
 import { getAQIColor, getAQIDescriptor } from '../utils/aqi';
@@ -13,6 +13,24 @@ function Home() {
 
     console.log(aqi);
 
+    const [values, setValues] = useState<number[]>(() =>
+      [...Array(50)].map((x, i) => 0)
+    );
+
+    useEffect(() => {
+      const t = setInterval(() => {
+        const newValues = values;
+        newValues.slice(1);
+        newValues.push(aqi);
+        setValues(newValues);
+      }, 250);
+
+      return () => {
+        clearInterval(t);
+      };
+    }, [aqi]);
+    
+
     return (
         <div>
             <div className="my-8 px-2 py-4 flex flex-col items-center">
@@ -24,7 +42,7 @@ function Home() {
                     </div>
                 </div>
                 <div className="mt-4">
-                    <Graph values={[...Array(50)].map((x, i) => (Math.sin(i / 5) + 1) * 250)} />
+                    <Graph values={values} />
                 </div>
             </div>
             <div className="divide-y divide-black">
